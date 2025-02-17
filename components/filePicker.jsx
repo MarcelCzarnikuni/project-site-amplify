@@ -15,7 +15,7 @@ const theme = {
           color: { value: 'white' },
         },
         text: {
-          color: { value: '{colors.primary[80]}' },
+          color: { value: 'white' },
         },
       },
     },
@@ -63,7 +63,7 @@ export default function DropZoneInput({ selectedFiles }) {
                 </VisuallyHidden>
             </DropZone>
             {files.map((file) => (
-                <Text key={file.name}>{file.name}</Text>
+                <Text style={{ color: 'white' }} key={file.name}>{file.name}</Text>
             ))}
             </ThemeProvider>
         </>

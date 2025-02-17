@@ -11,7 +11,7 @@ import { Button, Flex, Heading, Text, ThemeProvider } from '@aws-amplify/ui-reac
 import '@aws-amplify/ui-react/styles.css';
 import DropZoneInput from '../components/filePicker'
 import './../app/app.css'
-import NavBar from "@/components/navBar";
+import Navbar from "@/components/NavBar";
 
 Amplify.configure(outputs);
 const client = generateClient<Schema>();
@@ -54,6 +54,12 @@ export default function App() {
   const { user, signOut } = useAuthenticator();
   const [files, setFiles] = useState([]);
 
+  function ParseFloat(str: string, val: number) {
+    str = str.toString();
+    str = str.slice(0, (str.indexOf(".")) + val + 1);
+    return Number(str);
+  }
+
   async function uploadImage() {
     if (files.length === 0) {
       alert("No file selected.");
@@ -76,8 +82,10 @@ export default function App() {
       });
 
       const result = await response.json();
-      document.getElementById('resultCancer')!.textContent = `cancer prediction: ${result.predictionCancer}`;
-      document.getElementById('resultHealthy')!.textContent = `healthy prediction: ${result.predictionHealthy}`;
+      result.predictionCancer = ParseFloat(result.predictionCancer, 2) * 100
+      result.predictionHealthy = ParseFloat(result.predictionHealthy, 2) * 100
+      document.getElementById('resultCancer')!.textContent = `cancer prediction: ${result.predictionCancer} %`;
+      document.getElementById('resultHealthy')!.textContent = `healthy prediction: ${result.predictionHealthy} %`;
     } catch (error) {
       console.error('Error:', error);
       alert('failed');
@@ -86,13 +94,16 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
+      <Navbar />
       <Flex
         direction={{ base: 'column', large: 'row' }}
         maxWidth="32rem"
         padding="1rem"
         width="100%"
+        justifyContent="center"
+        alignContent="center"
       >
-        <Flex justifyContent="space-between" direction="column">
+        <Flex justifyContent="space-between" direction="column" alignItems="center" alignContent="center">
           <Heading level={2}>Brain Tumour Inference</Heading>
           <Text> Please select an image. </Text>
           <DropZoneInput selectedFiles={setFiles} />

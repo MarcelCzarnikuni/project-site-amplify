@@ -3,7 +3,7 @@
 import { Authenticator } from "@aws-amplify/ui-react";
 import "./globals.css";
 import "@aws-amplify/ui-react/styles.css";
-import NavBar from "@/components/navBar";
+import NavBar from "@/components/NavBar";
 
 export default function RootLayout({
   children,
@@ -11,11 +11,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-
     <html lang="en">
       <body>
         <Authenticator>
-          {/* <NavBar /> */}
           {children}
         </Authenticator>
       </body>
