@@ -3,15 +3,38 @@
 import { useState, useEffect } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "@/amplify/data/resource";
-import "./../app/app.css";
 import { Amplify } from "aws-amplify";
 import outputs from "@/amplify_outputs.json";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { fetchAuthSession } from '@aws-amplify/auth';
+import { Button, Flex, Heading, Text, ThemeProvider } from '@aws-amplify/ui-react';
+import '@aws-amplify/ui-react/styles.css';
+import DropZoneInput from '../components/filePicker'
+import './../app/app.css'
+import NavBar from "@/components/navBar";
 
 Amplify.configure(outputs);
 const client = generateClient<Schema>();
 
+const theme = {
+  name: 'custom-theme',
+  tokens: {
+    components: {
+      card: {
+        backgroundColor: { value: '{colors.background.secondary}' },
+        outlined: {
+          borderColor: { value: '{colors.black}' },
+        },
+      },
+      heading: {
+        color: { value: 'white' },
+      },
+      text: {
+        color: { value: 'white' },
+      },
+    },
+  },
+};
 
 const getAuthToken = async () => {
   try {
@@ -23,79 +46,68 @@ const getAuthToken = async () => {
   }
 };
 
+type input = {
+  files: Blob[]
+}
 
 export default function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
   const { user, signOut } = useAuthenticator();
+  const [files, setFiles] = useState([]);
 
-  function listTodos() {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }
-
-  useEffect(() => {
-    listTodos();
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({
-      content: window.prompt("Todo content"),
-    });
-  }
-
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
-  }
-
-  const sendRequest = async () => {
-    const token = await getAuthToken();
-
-    if (!token) {
-      console.error('User is not authenticated');
+  async function uploadImage() {
+    if (files.length === 0) {
+      alert("No file selected.");
       return;
     }
 
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('file', file);
+    });
+
+    // const file = input.files[0];
+    // const formData = new FormData();
+    // formData.append('file', file);
+
     try {
-      const response = await fetch('https://n5bop1su69.execute-api.us-east-1.amazonaws.com/predict', {
-        method: 'POST',  // Change based on your API
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': token, // Attach Cognito JWT
-        },
-        body: JSON.stringify({ key1: 'value1', key2: 'value2' }),
+      const response = await fetch('https://n5bop1su69.execute-api.us-east-1.amazonaws.com/predict/', {
+        method: 'POST',
+        body: formData
       });
 
-      const data = await response.json();
-      console.log('API response:', data);
+      const result = await response.json();
+      document.getElementById('resultCancer')!.textContent = `cancer prediction: ${result.predictionCancer}`;
+      document.getElementById('resultHealthy')!.textContent = `healthy prediction: ${result.predictionHealthy}`;
     } catch (error) {
-      console.error('Error calling API:', error);
+      console.error('Error:', error);
+      alert('failed');
     }
-  };
+  }
 
   return (
-    <main>
-      <h1 className="text-3xl font-bold underline">{user?.signInDetails?.loginId}'s todos</h1>
-      <button onClick={createTodo}>+ new</button>
-      <ul>
-        {todos.map((todo) => (
-          <li
-            onClick={() => deleteTodo(todo.id)}
-            key={todo.id}>
-            {todo.content}
-          </li>
-        ))}
+    <ThemeProvider theme={theme}>
+      <Flex
+        direction={{ base: 'column', large: 'row' }}
+        maxWidth="32rem"
+        padding="1rem"
+        width="100%"
+      >
+        <Flex justifyContent="space-between" direction="column">
+          <Heading level={2}>Brain Tumour Inference</Heading>
+          <Text> Please select an image. </Text>
+          <DropZoneInput selectedFiles={setFiles} />
 
-      </ul>
-      <div>
-        🥳 App successfully hosted. Try creating a new todo.
-        <br />
-        <a href="https://docs.amplify.aws/nextjs/start/quickstart/nextjs-app-router-client-components/">
-          Review next steps of this tutorial.
-        </a>
-      </div>
-      <button onClick={signOut}>Sign out</button>
-      <button onClick={sendRequest}>Send API Request</button>
-    </main>
+          <Button
+            loadingText="processing..."
+            onClick={() => uploadImage()}
+            variation="primary"
+          >
+            Get Inference
+          </Button>
+          <Text id="resultHealthy"></Text>
+          <Text id="resultCancer"></Text>
+        </Flex>
+      </Flex>
+    </ThemeProvider>
   );
 }

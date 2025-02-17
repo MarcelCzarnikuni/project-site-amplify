@@ -1,12 +1,9 @@
 "use client"
 
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./app.css";
 import { Authenticator } from "@aws-amplify/ui-react";
-import outputs from "@/amplify_outputs.json";
-
-const inter = Inter({ subsets: ["latin"] });
+import "./globals.css";
+import "@aws-amplify/ui-react/styles.css";
+import NavBar from "@/components/navBar";
 
 export default function RootLayout({
   children,
@@ -18,6 +15,7 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Authenticator>
+          {/* <NavBar /> */}
           {children}
         </Authenticator>
       </body>
