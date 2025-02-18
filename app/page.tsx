@@ -53,13 +53,14 @@ export default function App() {
   const getAuthToken = async () => {
     try {
       const session = await fetchAuthSession();
+      console.log(session.tokens?.accessToken?.toString())
       return session.tokens?.accessToken?.toString();
     } catch (error) {
       console.error('Error getting auth token:', error);
       return null;
     }
   };
-
+  getAuthToken()
   async function uploadImage() {
     if (files.length === 0) {
       alert("No file selected.");
@@ -73,7 +74,8 @@ export default function App() {
       const response = await fetch('https://n5bop1su69.execute-api.us-east-1.amazonaws.com/predict/', {
         method: 'POST',
         headers: {
-          Authorization: getAuthToken().toString()
+          'Content-Type': 'multipart/form-data',
+          'Authorization': getAuthToken().toString(),
         },
         body: formData
       });
