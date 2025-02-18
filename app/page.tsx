@@ -74,7 +74,6 @@ export default function App() {
       const response = await fetch('https://api.marcelcz.uk/predict/', {
         method: 'POST',
         headers: {
-          'Content-Type': 'multipart/form-data',
           'Authorization': getAuthToken().toString(),
         },
         body: formData
