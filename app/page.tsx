@@ -60,6 +60,7 @@ export default function App() {
     }
   };
   getAuthToken()
+
   async function uploadImage() {
     if (files.length === 0) {
       alert("No file selected.");
@@ -70,10 +71,11 @@ export default function App() {
       formData.append('file', file);
     });
     try {
+      const token = await getAuthToken()
       const response = await fetch('https://api.marcelcz.uk/predict/', {
         method: 'POST',
         headers: {
-          'Authorization': getAuthToken().toString(),
+          'Authorization': token?.toString(),
         },
         body: formData
       });
