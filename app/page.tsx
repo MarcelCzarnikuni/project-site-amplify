@@ -80,8 +80,8 @@ export default function App() {
         body: formData
       });
       const result = await response.json();
-      // result.predictionCancer = ParseFloat(result.predictionCancer, 2) * 100
-      // result.predictionHealthy = ParseFloat(result.predictionHealthy, 2) * 100
+      result.predictionCancer = ParseFloat(result.predictionCancer, 2) * 100
+      result.predictionHealthy = ParseFloat(result.predictionHealthy, 2) * 100
       document.getElementById('resultCancer')!.textContent = `cancer prediction: ${result.predictionCancer} %`;
       document.getElementById('resultHealthy')!.textContent = `healthy prediction: ${result.predictionHealthy} %`;
     } catch (error) {
