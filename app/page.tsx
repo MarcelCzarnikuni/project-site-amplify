@@ -36,16 +36,6 @@ const theme = {
   },
 };
 
-const getAuthToken = async () => {
-  try {
-    const session = await fetchAuthSession();
-    return session.tokens?.idToken?.toString();  // Get the ID token
-  } catch (error) {
-    console.error('Error getting auth token:', error);
-    return null;
-  }
-};
-
 type input = {
   files: Blob[]
 }
@@ -60,27 +50,33 @@ export default function App() {
     return Number(str);
   }
 
+  const getAuthToken = async () => {
+    try {
+      const session = await fetchAuthSession();
+      return session.tokens?.accessToken?.toString();
+    } catch (error) {
+      console.error('Error getting auth token:', error);
+      return null;
+    }
+  };
+
   async function uploadImage() {
     if (files.length === 0) {
       alert("No file selected.");
       return;
     }
-
     const formData = new FormData();
     files.forEach((file) => {
       formData.append('file', file);
     });
-
-    // const file = input.files[0];
-    // const formData = new FormData();
-    // formData.append('file', file);
-
     try {
       const response = await fetch('https://n5bop1su69.execute-api.us-east-1.amazonaws.com/predict/', {
         method: 'POST',
+        headers: {
+          Authorization: getAuthToken().toString()
+        },
         body: formData
       });
-
       const result = await response.json();
       result.predictionCancer = ParseFloat(result.predictionCancer, 2) * 100
       result.predictionHealthy = ParseFloat(result.predictionHealthy, 2) * 100
