@@ -75,7 +75,7 @@ export default function App() {
       const response = await fetch('https://api.marcelcz.uk/predict/', {
         method: 'POST',
         headers: {
-          'Authorization': token?.toString(),
+          'Authorization': token!.toString(),
         },
         body: formData
       });
