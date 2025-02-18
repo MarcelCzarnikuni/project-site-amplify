@@ -71,7 +71,7 @@ export default function App() {
       formData.append('file', file);
     });
     try {
-      const response = await fetch('https://n5bop1su69.execute-api.us-east-1.amazonaws.com/predict/', {
+      const response = await fetch('https://api.marcelcz.uk/predict/', {
         method: 'POST',
         headers: {
           'Content-Type': 'multipart/form-data',
