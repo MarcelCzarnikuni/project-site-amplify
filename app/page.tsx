@@ -44,11 +44,6 @@ export default function App() {
   const { user, signOut } = useAuthenticator();
   const [files, setFiles] = useState([]);
 
-  function ParseFloat(str: string, val: number) {
-    str = str.toString();
-    str = str.slice(0, (str.indexOf(".")) + val + 1);
-    return Number(str);
-  }
 
   const getAuthToken = async () => {
     try {
@@ -80,10 +75,10 @@ export default function App() {
         body: formData
       });
       const result = await response.json();
-      result.predictionCancer = ParseFloat(result.predictionCancer, 2) * 100
-      result.predictionHealthy = ParseFloat(result.predictionHealthy, 2) * 100
-      document.getElementById('resultCancer')!.textContent = `cancer prediction: ${result.predictionCancer} %`;
-      document.getElementById('resultHealthy')!.textContent = `healthy prediction: ${result.predictionHealthy} %`;
+      result.predictionCancer = Math.round(result.predictionCancer * 100)
+      result.predictionHealthy = Math.round(result.predictionHealthy * 100)
+      document.getElementById('resultCancer')!.textContent = `Likelihood of cancer: ${result.predictionCancer} %`;
+      document.getElementById('resultHealthy')!.textContent = `Likelihood of no cancer: ${result.predictionHealthy} %`;
     } catch (error) {
       console.error('Error:', error);
       alert('failed');
